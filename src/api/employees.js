@@ -77,6 +77,44 @@ employeesRouter.get('/:employeeId', (req, res)=> {
 });
 
 
+employeesRouter.put('/:employeeId', validateEmployeeFields, (req, res, next) => {
+    const employeeId = req.params.employeeId;
+    const requestData = req.body.employee;
+    const isCurrentEmployee = requestData.isCurrentEmployee === 0 ? 0 : 1;
+    db.run('UPDATE Employee SET name = $name, position = $position, wage = $wage, is_current_employee = $current WHERE id = $id',
+    {$name: requestData.name,
+    $position: requestData.position,
+    $wage: requestData.wage,
+    $current: isCurrentEmployee,
+    $id: employeeId
+}, (err) => {
+    if(err) {
+        next(err);
+        res.status(500).send('Internal Server Error. Update failed.');
+        return;
+    }
+
+    db.get('SELECT * FROM Employee WHERE id = $id', {$id: employeeId}, (error, row) => {
+        if (error) {
+          console.error(error.message);
+          next(error);
+          res.status(500).send('Internal Server Error. Failed to retrieve updated artist.');
+        } if (!row) {
+            res.status(404).send('Employee not found.');
+        } else {
+            res.status(200).send({ employee: row });
+        }
+      })
+}
+
+)
+});
+
+// `name` TEXT NOT NULL, ' +
+//            '`position` TEXT NOT NULL, ' +
+//            '`wage` INTEGER NOT NULL, ' +
+//            '`is_current_employee` INTEGER NOT NULL DEFAULT 1, 
+
 
 
 module.exports = employeesRouter;
