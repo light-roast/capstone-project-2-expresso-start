@@ -110,10 +110,26 @@ employeesRouter.put('/:employeeId', validateEmployeeFields, (req, res, next) => 
 )
 });
 
-// `name` TEXT NOT NULL, ' +
-//            '`position` TEXT NOT NULL, ' +
-//            '`wage` INTEGER NOT NULL, ' +
-//            '`is_current_employee` INTEGER NOT NULL DEFAULT 1, 
+employeesRouter.delete('/:employeeId', (req, res, next) => {
+    db.run('UPDATE Employee SET is_current_employee = 0 WHERE id = $id', {$id: req.params.employeeId},
+    (err) => {
+        if(err) {
+            next(err);
+            res.status(500).send('Internal server error. Deletion failed');
+            return;
+        }
+        db.get('SELECT * FROM Employee WHERE id = $id', {$id: req.params.employeeId}, (error, row) => {
+            if(error) {
+                next(error);
+                res.status(500).send('Failed to retrieve deleted artist.');
+            } else {
+                res.status(200).send({employee: row});
+            }
+        });
+    });
+}
+
+);
 
 
 
