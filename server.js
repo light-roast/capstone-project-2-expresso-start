@@ -31,5 +31,5 @@ Expresso.use('/api', apiRouter);
 
 // Start the server
 Expresso.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+  console.log(`Server is running on port ${PORT}.`);
 });
