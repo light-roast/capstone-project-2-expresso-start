@@ -4,6 +4,7 @@ const sqlite3 = require('sqlite3');
 const path = require('path');
 const dbPath = path.join(__dirname, '../database.sqlite');
 const db = new sqlite3.Database(process.env.TEST_DATABASE || dbPath);
+const timesheetsRouter = require('./timesheets');
 
 //Get all employees in DB
 employeesRouter.get('/', (req, res, next) => {
@@ -96,7 +97,6 @@ employeesRouter.put('/:employeeId', validateEmployeeFields, (req, res, next) => 
 
     db.get('SELECT * FROM Employee WHERE id = $id', {$id: employeeId}, (error, row) => {
         if (error) {
-          console.error(error.message);
           next(error);
           res.status(500).send('Internal Server Error. Failed to retrieve updated artist.');
         } if (!row) {
@@ -130,6 +130,8 @@ employeesRouter.delete('/:employeeId', (req, res, next) => {
 }
 
 );
+
+employeesRouter.use('/:employeeId/timesheets', timesheetsRouter)
 
 
 
